@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:,">
-<title>photo-to-ar</title>
+<title>pic2ar</title>
 <!-- model-viewerはバージョン完全固定(挙動の再現性のため) -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
 <style>
@@ -113,7 +113,7 @@
 </head>
 <body>
 <header>
-  <span class="brand">photo-to-ar</span>
+  <span class="brand">pic2ar</span>
   <h1 id="model-name">model</h1>
 </header>
 
@@ -158,7 +158,7 @@
 
   // フォールバック表示(リスト取得前・取得失敗時)はdata-title＋既定のmodel.*のまま
   nameEl.textContent = viewer.dataset.title || 'model';
-  document.title = `photo-to-ar | ${nameEl.textContent}`;
+  document.title = `pic2ar | ${nameEl.textContent}`;
 
   function apply(m) {
     viewer.setAttribute('src', m.glb);
@@ -166,7 +166,7 @@
     else viewer.removeAttribute('ios-src');
     const label = META[m.id]?.label ?? m.id;
     nameEl.textContent = label;
-    document.title = `photo-to-ar | ${label}`;
+    document.title = `pic2ar | ${label}`;
     usdzLink.href = m.usdz ?? m.glb;
     history.replaceState(null, '', `#m=${encodeURIComponent(m.id)}`);
     for (const b of listEl.children) b.classList.toggle('active', b.dataset.id === m.id);

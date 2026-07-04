@@ -1,4 +1,4 @@
-# photo-to-ar
+# pic2ar
 
 Turn a single photo into a 3D model you can place in your room with iPhone AR — fully local, no cloud.
 

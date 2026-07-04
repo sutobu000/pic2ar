@@ -1,0 +1,17 @@
+{
+  "name": "photo-to-ar-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Photo -> local TRELLIS -> .glb -> ARKit-compliant .usdz, fully local (three.js USDZExporter in headless Chromium + Pixar usd-core).",
+  "type": "module",
+  "scripts": {
+    "make-test-model": "node make-test-model.mjs",
+    "glb2usdz": "node glb-to-usdz.mjs",
+    "generate": "node photo-to-model.mjs",
+    "verify": "node verify.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1",
+    "three": "^0.185.1"
+  }
+}

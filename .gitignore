@@ -1,0 +1,13 @@
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# 変換途中の一時ファイル
+*.three.tmp.usdz
+
+# OS
+.DS_Store
+Thumbs.db

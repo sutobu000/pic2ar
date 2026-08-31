@@ -16,8 +16,11 @@ Turn a single photo into a 3D model you can place in your room with iPhone AR �
 
 | パス | 役割 |
 |---|---|
-| `index.html` | ビューアページ(model-viewer・モデル選択リスト・AR対応) |
-| `serve.ps1` / `serve.py` | LAN配信サーバ(0.0.0.0:8420。usdz/glbへ正しいMIME付与+`/api/models`一覧API) |
+| `index.html` | ビューアページ(model-viewer・モデル選択リスト・AR対応)。**サイド固有文字列は持たない** |
+| `site.config.json` | 見出し・タイトル等のサイド固有設定(各サイドがcommit・実行時にindex.htmlへ反映) |
+| `models.local.json` | モデル表示名/並び順のローカルマップ(gitignore・同期対象外) |
+| `serve.ps1` / `serve.py` | LAN配信サーバ(0.0.0.0:`$WEBAR_PORT`(既定8420)。usdz/glbへ正しいMIME付与+`/api/models`一覧API) |
+| `tools/sync-to-consumer.mjs` | このcanonicalから消費側web-arへ共有ソースを一方向同期(sha256ガード付き) |
 | `assets/` | モデル置き場。**glbを置くだけでリストに自動表示**(サンプル同梱) |
 | `tools/photo-to-model.mjs` | **写真→glb→usdzの一気通貫コマンド**(要TRELLISサーバ) |
 | `tools/glb-to-usdz.mjs` | glb→usdz変換のみ(手持ちのglbにも使える) |
@@ -100,6 +103,25 @@ iPhoneのAR Quick Lookは`.usdz`しか受け付けないため、2段で変換�
 - **得意**: 輪郭のはっきりした単体被写体(動物・家具・食器・箱もの)
 - **苦手**: 透明/半透明(ガラス・クラゲ)、鏡面反射(テクスチャに焼き込まれる)、
   平板(看板)、細い枝もの。写真1枚なので**見えていない面はAIの推測**になります
+
+## 消費側への同期(canonical -> consumer)
+
+このpic2arを唯一のソース(canonical)として、消費側(例: 3d-factoryの`web-ar`サブディレクトリ)へ
+共有ソース(`index.html`・配信サーバ・`tools/`)を**一方向**に配ります。逆流はしません。
+
+```powershell
+# 既定の消費側パス(../../factories/3d-factory/web-ar)へ同期
+node tools/sync-to-consumer.mjs --dry-run   # まず差分確認
+node tools/sync-to-consumer.mjs             # 適用
+
+# 別の場所を指すとき
+$env:WEBAR_CONSUMER_DIR = 'C:\path\to\web-ar'; node tools/sync-to-consumer.mjs
+```
+
+- **sha256ガード**: 書き込んだ実体を読み戻して照合し、破損コピーを検出したら消して中断します。
+- **サイド固有は壊さない**: `site.config.json`・`models.local.json`・`.gitignore`・`README.md`・
+  `assets/*`は同期対象外(=各サイドで独立)。だから消費側の見出しやモデル一覧・既定モデルは保たれます。
+- テキストはLF正規化して冪等(変化が無ければ何も書きません)。
 
 ## License
 

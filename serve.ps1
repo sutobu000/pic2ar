@@ -1,5 +1,8 @@
-# web-ar静的サーバ起動: LAN IPv4とURLを表示してから0.0.0.0:8420で配信する
+# web-ar静的サーバ起動: LAN IPv4とURLを表示してから0.0.0.0:$portで配信する
 $ErrorActionPreference = 'Stop'
+
+# 配信ポートは環境変数WEBAR_PORTで上書き可(未指定なら8420)。serve.py側も同じ変数を見る
+$port = if ($env:WEBAR_PORT) { $env:WEBAR_PORT } else { '8420' }
 
 # デフォルトゲートウェイを持つUpなアダプタ=実際にWi-Fi/LANへ出ているIPを優先する
 $ip = (Get-NetIPConfiguration |
@@ -13,8 +16,8 @@ if (-not $ip) {
 
 Write-Host ''
 Write-Host '  web-ar server' -ForegroundColor Cyan
-Write-Host "  iPhone (same Wi-Fi):  http://${ip}:8420" -ForegroundColor Green
-Write-Host '  This PC:              http://localhost:8420'
+Write-Host "  iPhone (same Wi-Fi):  http://${ip}:${port}" -ForegroundColor Green
+Write-Host "  This PC:              http://localhost:${port}"
 Write-Host '  Stop:                 Ctrl+C'
 Write-Host ''
 Write-Host '  iPhoneから繋がらない場合: 初回起動時のWindowsファイアウォール確認で'

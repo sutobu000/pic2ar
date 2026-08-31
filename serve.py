@@ -8,7 +8,8 @@ import json
 import os
 from pathlib import Path
 
-PORT = 8420
+# 配信ポートは環境変数WEBAR_PORTで上書き可(未指定なら8420)。CIや複数同時起動で衝突を避けるため
+PORT = int(os.environ.get('WEBAR_PORT') or 8420)
 
 # 配信ルートをこのファイルのあるweb-ar直下に固定する(どこから起動しても同じ挙動にするため)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))

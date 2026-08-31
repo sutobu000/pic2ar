@@ -1,3 +1,7 @@
+# サイド固有のモデル表示名マップ(ローカル管理・同期対象外)。commitしない。
+# 注意: この行より後に models.local.json を再包含する `!` パターンを置かないこと
+models.local.json
+
 # Node
 node_modules/
 

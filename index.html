@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:,">
-<title>pic2ar</title>
+<!-- ページ固有の見出し・タイトルはsite.config.json(各サイドがcommit)から実行時に流し込む。
+     このindex.htmlはpic2ar(canonical)を単一ソースとしconsumerへ同期される共有ソースなので、
+     サイド固有の文字列はここに直書きしない(sync-to-consumer.mjsが上書きしても値を壊さないため)。 -->
+<title>web-ar</title>
 <!-- model-viewerはバージョン完全固定(挙動の再現性のため) -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
 <style>
@@ -113,13 +116,13 @@
 </head>
 <body>
 <header>
-  <span class="brand">pic2ar</span>
+  <span class="brand" id="brand">web-ar</span>
   <h1 id="model-name">model</h1>
 </header>
 
 <model-viewer
   id="viewer"
-  data-title="テストモデル(トーラスノット)"
+  data-title="model"
   src="./assets/model.glb"
   ios-src="./assets/model.usdz"
   alt="写真から生成した3Dモデル"
@@ -147,18 +150,31 @@
 <script type="module">
   const viewer = document.getElementById('viewer');
   const nameEl = document.getElementById('model-name');
+  const brandEl = document.getElementById('brand');
   const usdzLink = document.getElementById('usdz-link');
   const listEl = document.getElementById('models');
 
-  // モデルの表示名と並び順(任意)。assets/に置いたglbは書かなくても自動でリストに載る
+  // サイド固有の見出し・既定タイトルはsite.config.json(各サイドがcommitする)から読む。
+  // 取得できない場合でも動くよう中立な既定値にフォールバックする。
+  const SITE = await fetch('./site.config.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : {}))
+    .catch(() => ({}));
+  const brand = SITE.brand ?? 'web-ar';
+  const titlePrefix = SITE.titlePrefix ?? brand;
+  brandEl.textContent = brand;
+  if (SITE.dataTitle) viewer.dataset.title = SITE.dataTitle;
+  if (SITE.alt) viewer.setAttribute('alt', SITE.alt);
+
+  // モデルの表示名と並び順。assets/に置いたglbは書かなくても自動でリストに載る
   // (その場合はファイル名がそのまま表示され、新しい順に先頭へ並ぶ)。
-  const META = {
-    // 'mymodel': { label: '表示名', sub: '補足', order: 1 },
-  };
+  // 内容はサイドごとにローカル管理するためmodels.local.json(gitignore)へ分離した。
+  const META = await fetch('./models.local.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : {}))
+    .catch(() => ({}));
 
   // フォールバック表示(リスト取得前・取得失敗時)はdata-title＋既定のmodel.*のまま
   nameEl.textContent = viewer.dataset.title || 'model';
-  document.title = `pic2ar | ${nameEl.textContent}`;
+  document.title = `${titlePrefix} | ${nameEl.textContent}`;
 
   function apply(m) {
     viewer.setAttribute('src', m.glb);
@@ -166,7 +182,7 @@
     else viewer.removeAttribute('ios-src');
     const label = META[m.id]?.label ?? m.id;
     nameEl.textContent = label;
-    document.title = `pic2ar | ${label}`;
+    document.title = `${titlePrefix} | ${label}`;
     usdzLink.href = m.usdz ?? m.glb;
     history.replaceState(null, '', `#m=${encodeURIComponent(m.id)}`);
     for (const b of listEl.children) b.classList.toggle('active', b.dataset.id === m.id);

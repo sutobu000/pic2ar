@@ -1,5 +1,5 @@
 {
-  "name": "pic2ar-tools",
+  "name": "web-ar-tools",
   "version": "1.0.0",
   "private": true,
   "description": "Photo -> local TRELLIS -> .glb -> ARKit-compliant .usdz, fully local (three.js USDZExporter in headless Chromium + Pixar usd-core).",
